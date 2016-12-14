@@ -14,8 +14,15 @@ public class MechController : MonoBehaviour
 	public GameObject[] pivots = new GameObject[16];
 	public float[] rotateSpeed = new float[16];
 
+	public float moveSpeed;
+
 	private Quaternion[] targetRotation;
 	private bool[] rotatePivot;
+
+	private bool isWalking;
+
+	private Rigidbody rb;
+	private Vector3 destination;
 
 	/*
 	public GameObject rightShoulderPivot;
@@ -36,11 +43,23 @@ public class MechController : MonoBehaviour
 	public GameObject headPivot;
 	*/
 
+
+
 	// Use this for initialization
 	void Start () 
 	{
+		isWalking = false;
+
 		targetRotation = new Quaternion[pivots.Length];
 		rotatePivot = new bool[pivots.Length];
+
+		rb = this.GetComponent<Rigidbody>();
+
+		// testing section below vvv
+		destination = new Vector3(0.0f, 0.0f, 10.0f);
+		StartWalking();
+
+		// testing section above ^^^
 	}
 	
 	// Update is called once per frame
@@ -64,6 +83,11 @@ public class MechController : MonoBehaviour
 			}
 		}
 
+		if(isWalking)
+		{
+			WalkTo();
+			//WalkTo(destination);
+		}
 	}
 
 	/// <summary>
@@ -97,5 +121,32 @@ public class MechController : MonoBehaviour
 	private void UpdatePivot(int p)
 	{
 		pivots[p].transform.rotation = Quaternion.RotateTowards(pivots[p].transform.rotation, targetRotation[p], rotateSpeed[p] * Time.deltaTime);
+	}
+
+	public void StartWalking()
+	{
+		isWalking = true;
+	}
+
+	public void StopWalking()
+	{
+		isWalking = false;
+	}
+
+	// for these walk functions, need to add pauses to movement
+	private void WalkTo()
+	{
+		this.transform.Translate(this.transform.forward * Time.deltaTime * moveSpeed);
+	}
+
+	private void WalkTo(Vector3 dir)
+	{
+		dir.y = 0.0f;
+		dir.Normalize();
+
+		this.transform.Translate(dir * Time.deltaTime * moveSpeed);
+
+		//MoveLegs();
+
 	}
 }
